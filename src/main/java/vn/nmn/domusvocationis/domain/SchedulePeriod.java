@@ -1,5 +1,6 @@
 package vn.nmn.domusvocationis.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Future;
@@ -15,6 +16,7 @@ import vn.nmn.domusvocationis.util.constant.ScheduleTypeEnum;
 import vn.nmn.domusvocationis.util.constant.SessionTimeEnum;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -27,16 +29,16 @@ import java.util.Set;
         endField = "registrationEndTime",
         message = "Thời gian đăng ký không hợp lệ"
 )
-@ChronologicalDates(
-        startField = "startDate",
-        endField = "endDate",
-        message = "Thời gian thực hiện không hợp lệ"
-)
-@ChronologicalDates(
-        startField = "registrationStartTime",
-        endField = "startDate",
-        message = "Thời gian thực hiện phải sau thời gian đăng ký"
-)
+//@ChronologicalDates(
+//        startField = "startDate",
+//        endField = "endDate",
+//        message = "Thời gian thực hiện không hợp lệ"
+//)
+//@ChronologicalDates(
+//        startField = "registrationStartTime",
+//        endField = "startDate",
+//        message = "Thời gian thực hiện phải sau thời gian đăng ký"
+//)
 public class SchedulePeriod {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,10 +52,12 @@ public class SchedulePeriod {
     private ScheduleTypeEnum type;
 
     @NotNull(message = "Ngày bắt đầu không được để trống")
-    private Instant startDate;
+    @JsonFormat(pattern = "dd-MM-yyyy")
+    private LocalDate startDate;
 
     @NotNull(message = "Ngày kết thúc không được để trống")
-    private Instant endDate;
+    @JsonFormat(pattern = "dd-MM-yyyy")
+    private LocalDate endDate;
 
     @NotNull(message = "Thời điểm bắt đầu đăng ký không được để trống")
     private Instant registrationStartTime;

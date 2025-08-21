@@ -43,7 +43,7 @@ public class ChronologicalDatesValidator implements ConstraintValidator<Chronolo
             Instant start = (Instant) startValue;
             Instant end = (Instant) endValue;
 
-            if (end.isAfter(start)) {
+            if (end.equals(start) || end.isAfter(start)) {
                 return true;
             }
 

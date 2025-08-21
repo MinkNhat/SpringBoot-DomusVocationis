@@ -3,9 +3,7 @@ package vn.nmn.domusvocationis.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import vn.nmn.domusvocationis.domain.Role;
 import vn.nmn.domusvocationis.domain.SchedulePeriod;
 import vn.nmn.domusvocationis.domain.ScheduleSlot;
 import vn.nmn.domusvocationis.domain.response.ResPaginationDTO;
@@ -15,8 +13,8 @@ import vn.nmn.domusvocationis.repository.UserRepository;
 import vn.nmn.domusvocationis.util.DateTimeUtil;
 import vn.nmn.domusvocationis.util.constant.SchedulePeriodStatusEnum;
 import vn.nmn.domusvocationis.util.constant.SessionTimeEnum;
+import vn.nmn.domusvocationis.util.error.IdInvalidException;
 
-import java.time.temporal.ChronoUnit;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -33,13 +31,10 @@ public class SchedulePeriodService {
 
     private final UserRepository userRepository;
 
-    private final DateTimeUtil dateTimeUtil;
-
     public SchedulePeriodService(SchedulePeriodRepository periodRepository, ScheduleSlotRepository slotRepository, UserRepository userRepository, DateTimeUtil dateTimeUtil) {
         this.periodRepository = periodRepository;
         this.slotRepository = slotRepository;
         this.userRepository = userRepository;
-        this.dateTimeUtil = dateTimeUtil;
     }
 
     public SchedulePeriod getPeriodById(Long id) {
@@ -77,13 +72,9 @@ public class SchedulePeriodService {
             period.setAllowedSessions(Set.of(SessionTimeEnum.ALL_DAY));
         }
 
-        if(period.getStatus() != null && period.getStatus() == SchedulePeriodStatusEnum.OPENING)
+        if(period.getStatus() != null && period.getStatus() == SchedulePeriodStatusEnum.OPENING) {
             period.setRegistrationStartTime(Instant.now());
-        else period.setStatus(SchedulePeriodStatusEnum.PENDING);
-
-        // số ngày = số lượng users có role là null ( người dùng thường ) đang active
-//        int numberOfDays = (int) userRepository.countByActiveAndRole(true, null);
-
+        }
 
         List<Instant> registrationDates = generateDates(period.getStartDate(), period.getEndDate(), period.getExcludedDaysOfWeek());
 
@@ -95,7 +86,9 @@ public class SchedulePeriodService {
             period.setMaxSlots(totalSlotsNeeded);
         }
 
-        period.setName(String.format("%s PERIOD (%s -> %s)", period.getType(), dateTimeUtil.formatInstant(period.getStartDate()), dateTimeUtil.formatInstant(period.getEndDate())));
+        if(period.getName() == null || period.getName().isEmpty())
+            period.setName(String.format("%s PERIOD (%s -> %s)", period.getType(), period.getStartDate(), period.getEndDate()));
+
         period = this.periodRepository.save(period); //save trước để slot tham chiếu đến period không lỗi
 
         List<ScheduleSlot> slots = new ArrayList<>();
@@ -113,19 +106,49 @@ public class SchedulePeriodService {
         return period;
     }
 
-    private List<Instant> generateDates(Instant startDate, Instant endDate, Set<Integer> excludedDaysOfWeek) {
-        List<Instant> dates = new ArrayList<>();
-        Instant currentDate = startDate.truncatedTo(ChronoUnit.DAYS);
-        Instant end = endDate.truncatedTo(ChronoUnit.DAYS);
+    public SchedulePeriod updatePeriod(SchedulePeriod period, SchedulePeriod dbPeriod) throws IdInvalidException {
+        if(period.getName() == null || period.getName().isEmpty()) {
+            dbPeriod.setName(String.format("%s PERIOD (%s -> %s)", dbPeriod.getType(), dbPeriod.getStartDate(), dbPeriod.getEndDate()));
+        } else {
+            dbPeriod.setName(period.getName());
+        }
 
-        while (!currentDate.isAfter(end)) {
-            LocalDate localDate = currentDate.atZone(ZoneOffset.UTC).toLocalDate();
-            int dayValue = localDate.getDayOfWeek().getValue() % 7; // Sunday = 0
+        dbPeriod.setRegistrationStartTime(period.getRegistrationStartTime());
+        dbPeriod.setRegistrationEndTime(period.getRegistrationEndTime());
+
+        if(period.getStatus() != null && period.getStatus() == SchedulePeriodStatusEnum.OPENING) {
+            dbPeriod.setRegistrationStartTime(Instant.now());
+        } else if(period.getStatus() != null && period.getStatus() == SchedulePeriodStatusEnum.CLOSED) {
+            dbPeriod.setRegistrationEndTime(Instant.now());
+        }
+
+        dbPeriod.setStatus(period.getStatus());
+
+        if(!dbPeriod.getRegistrationStartTime().isBefore(dbPeriod.getRegistrationEndTime())) {
+            throw new IdInvalidException(String.format("Thời gian bắt đầu đăng ký (%s) phải nhỏ hơn thời gian kết thúc (%s)", dbPeriod.getRegistrationStartTime(), dbPeriod.getRegistrationEndTime()));
+        }
+
+        return this.periodRepository.save(dbPeriod);
+    }
+
+    public void deletePeriod(Long id) {
+        SchedulePeriod period = this.periodRepository.findById(id).orElse(null);
+        this.slotRepository.deleteByPeriod(period);
+        this.periodRepository.deleteById(id);
+    }
+
+    private List<Instant> generateDates(LocalDate startDate, LocalDate endDate, Set<Integer> excludedDaysOfWeek) {
+        List<Instant> dates = new ArrayList<>();
+        LocalDate currentDate = startDate;
+
+        while (!currentDate.isAfter(endDate)) {
+            int dayValue = currentDate.getDayOfWeek().getValue() % 7; // Sunday = 0
 
             if (!excludedDaysOfWeek.contains(dayValue)) {
-                dates.add(currentDate);
+                Instant instant = currentDate.atStartOfDay(ZoneOffset.UTC).toInstant();
+                dates.add(instant);
             }
-            currentDate = currentDate.plus(1, ChronoUnit.DAYS);
+            currentDate = currentDate.plusDays(1);
         }
 
         return dates;
