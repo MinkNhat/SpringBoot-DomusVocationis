@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import vn.nmn.domusvocationis.domain.SchedulePeriod;
 import vn.nmn.domusvocationis.domain.ScheduleSlot;
 import vn.nmn.domusvocationis.domain.response.ResPaginationDTO;
+import vn.nmn.domusvocationis.domain.response.schedule.ResSlotByPeriodDTO;
 import vn.nmn.domusvocationis.repository.SchedulePeriodRepository;
 import vn.nmn.domusvocationis.repository.ScheduleSlotRepository;
 import vn.nmn.domusvocationis.repository.UserRepository;
@@ -35,6 +36,27 @@ public class SchedulePeriodService {
         this.periodRepository = periodRepository;
         this.slotRepository = slotRepository;
         this.userRepository = userRepository;
+    }
+
+    public ResSlotByPeriodDTO getSlotByPeriod(SchedulePeriod period) {
+        ResSlotByPeriodDTO res = new ResSlotByPeriodDTO();
+        res.setId(period.getId());
+
+        List<ResSlotByPeriodDTO.Slot> listSlot = new ArrayList<>();
+
+        period.getScheduleSlots().forEach(s -> {
+            List<ResSlotByPeriodDTO.Slot.UserSlot> listUser = new ArrayList<>();
+            s.getUsers().forEach(u -> {
+                    ResSlotByPeriodDTO.Slot.UserSlot resUser = new ResSlotByPeriodDTO.Slot.UserSlot(u.getId(), u.getFullName());
+                    listUser.add(resUser);
+            });
+
+            ResSlotByPeriodDTO.Slot resSlot = new ResSlotByPeriodDTO.Slot(s.getId(), s.getRegistrationDate(), s.getSessionTime(), listUser);
+            listSlot.add(resSlot);
+        });
+
+        res.setSlots(listSlot);
+        return res;
     }
 
     public SchedulePeriod getPeriodById(Long id) {

@@ -60,7 +60,6 @@ public class ScheduleSlot {
     }
 
 
-
 //    public boolean hasUser(User user) {
 //        return this.users.contains(user);
 //    }

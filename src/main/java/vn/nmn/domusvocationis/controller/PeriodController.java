@@ -11,6 +11,7 @@ import vn.nmn.domusvocationis.domain.Role;
 import vn.nmn.domusvocationis.domain.SchedulePeriod;
 import vn.nmn.domusvocationis.domain.User;
 import vn.nmn.domusvocationis.domain.response.ResPaginationDTO;
+import vn.nmn.domusvocationis.domain.response.schedule.ResSlotByPeriodDTO;
 import vn.nmn.domusvocationis.service.SchedulePeriodService;
 import vn.nmn.domusvocationis.util.annotation.ApiMessage;
 import vn.nmn.domusvocationis.util.error.IdInvalidException;
@@ -22,6 +23,16 @@ public class PeriodController {
 
     public PeriodController(SchedulePeriodService periodService) {
         this.periodService = periodService;
+    }
+
+    @GetMapping("/periods/{id}/slots")
+    @ApiMessage("get slots by period")
+    public ResponseEntity<ResSlotByPeriodDTO> getSlotsByPeriod(@PathVariable Long id) throws IdInvalidException {
+        SchedulePeriod period = periodService.getPeriodById(id);
+        if (period == null) {
+            throw new IdInvalidException("Phiên đăng ký có id = " + id + " không tồn tại");
+        }
+        return ResponseEntity.ok(this.periodService.getSlotByPeriod(period));
     }
 
     @GetMapping("/periods/{id}")

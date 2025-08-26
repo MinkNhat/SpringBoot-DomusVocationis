@@ -99,4 +99,9 @@ public class SchedulePeriod {
         this.updatedBy = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
         this.updatedAt = Instant.now();
     }
+
+    public int getCurrentUsers() {
+        if(scheduleSlots == null) return 0;
+        return (int)scheduleSlots.stream().mapToLong(slot -> slot.getUsers().size()).sum();
+    }
 }
