@@ -1,21 +1,19 @@
 package vn.nmn.domusvocationis.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
-import vn.nmn.domusvocationis.domain.SchedulePeriod;
-import vn.nmn.domusvocationis.domain.ScheduleSlot;
+import vn.nmn.domusvocationis.domain.Period;
+import vn.nmn.domusvocationis.domain.Session;
 import vn.nmn.domusvocationis.domain.User;
 import vn.nmn.domusvocationis.util.constant.SessionTimeEnum;
 
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 @Transactional
-public interface ScheduleSlotRepository extends JpaRepository<ScheduleSlot, Long> {
-    void deleteByPeriod(SchedulePeriod period);
-    List<ScheduleSlot> findByPeriodAndRegistrationDateAndSessionTimeAndUsersContaining(SchedulePeriod period, Instant registrationDate, SessionTimeEnum sessionTime, User user);
+public interface SessionRepository extends JpaRepository<Session, Long> {
+    void deleteByPeriod(Period period);
+    List<Session> findByPeriodAndRegistrationDateAndSessionTimeAndUsersContaining(Period period, LocalDate registrationDate, SessionTimeEnum sessionTime, User user);
 
 
 //    List<ScheduleSlot> findByPeriod(SchedulePeriod period);

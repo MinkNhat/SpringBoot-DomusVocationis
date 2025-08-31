@@ -87,7 +87,7 @@ public class User {
 
     @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<ScheduleSlot> scheduleSlots;
+    private List<Session> sessions;
 
     @PrePersist
     public void handleBeforeCreate() {

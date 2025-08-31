@@ -1,5 +1,5 @@
 package vn.nmn.domusvocationis.util.constant;
 
-public enum SchedulePeriodStatusEnum {
+public enum PeriodStatusEnum {
     PENDING, OPENING, CLOSED
 }

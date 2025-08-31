@@ -3,16 +3,13 @@ package vn.nmn.domusvocationis.domain;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import vn.nmn.domusvocationis.util.SecurityUtil;
 import vn.nmn.domusvocationis.util.annotation.ChronologicalDates;
-import vn.nmn.domusvocationis.util.constant.SchedulePeriodStatusEnum;
-import vn.nmn.domusvocationis.util.constant.ScheduleTypeEnum;
+import vn.nmn.domusvocationis.util.constant.PeriodStatusEnum;
+import vn.nmn.domusvocationis.util.constant.PeriodTypeEnum;
 import vn.nmn.domusvocationis.util.constant.SessionTimeEnum;
 
 import java.time.Instant;
@@ -21,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "schedule_periods")
+@Table(name = "periods")
 @Getter
 @Setter
 @ChronologicalDates(
@@ -29,27 +26,26 @@ import java.util.Set;
         endField = "registrationEndTime",
         message = "Thời gian đăng ký không hợp lệ"
 )
-//@ChronologicalDates(
-//        startField = "startDate",
-//        endField = "endDate",
-//        message = "Thời gian thực hiện không hợp lệ"
-//)
+@ChronologicalDates(
+        startField = "startDate",
+        endField = "endDate",
+        message = "Thời gian thực hiện không hợp lệ"
+)
 //@ChronologicalDates(
 //        startField = "registrationStartTime",
 //        endField = "startDate",
 //        message = "Thời gian thực hiện phải sau thời gian đăng ký"
 //)
-public class SchedulePeriod {
+public class Period {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
-    private SchedulePeriodStatusEnum status;
-    private Integer maxSlots;
+    private PeriodStatusEnum status;
 
     @NotNull(message = "Loại phiên không được để trống")
-    private ScheduleTypeEnum type;
+    private PeriodTypeEnum type;
 
     @NotNull(message = "Ngày bắt đầu không được để trống")
     @JsonFormat(pattern = "dd-MM-yyyy")
@@ -65,9 +61,6 @@ public class SchedulePeriod {
     @NotNull(message = "Thời điểm kết thúc đăng ký không được để trống")
     private Instant registrationEndTime;
 
-    @Min(value = 1, message = "Số người trong buổi phải lớn hơn 0")
-    private Integer peoplePerSession = 1;
-
     @ElementCollection
     @CollectionTable(name = "period_excluded_days", joinColumns = @JoinColumn(name = "period_id"))
     @Column(name = "day_of_week")
@@ -79,6 +72,9 @@ public class SchedulePeriod {
     @Column(name = "session_time")
     private Set<SessionTimeEnum> allowedSessions = Set.of(SessionTimeEnum.ALL_DAY);
 
+    @Column(columnDefinition = "MEDIUMTEXT")
+    private String notes;
+
     private Instant createdAt;
     private Instant updatedAt;
     private String createdBy;
@@ -86,7 +82,7 @@ public class SchedulePeriod {
 
     @OneToMany(mappedBy = "period", fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<ScheduleSlot> scheduleSlots;
+    private List<Session> sessions;
 
     @PrePersist
     public void handleBeforeCreate() {
@@ -101,7 +97,12 @@ public class SchedulePeriod {
     }
 
     public int getCurrentUsers() {
-        if(scheduleSlots == null) return 0;
-        return (int)scheduleSlots.stream().mapToLong(slot -> slot.getUsers().size()).sum();
+        if(sessions == null) return 0;
+        return (int) sessions.stream().mapToLong(s -> s.getUsers().size()).sum();
+    }
+
+    public int getTotalSlot() {
+        if(sessions == null) return 0;
+        return (int) sessions.stream().mapToLong(s -> s.getTotalSlot()).sum();
     }
 }

@@ -3,29 +3,30 @@ package vn.nmn.domusvocationis.domain.response.schedule;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import vn.nmn.domusvocationis.domain.SchedulePeriod;
-import vn.nmn.domusvocationis.util.constant.SchedulePeriodStatusEnum;
+import vn.nmn.domusvocationis.util.constant.PeriodStatusEnum;
 import vn.nmn.domusvocationis.util.constant.SessionTimeEnum;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
-public class ResSlotDTO {
+public class ResSessionDTO {
     private Long id;
-    private Instant registrationDate;
+    private LocalDate registrationDate;
     private SessionTimeEnum sessionTime;
-    private PeriodSlot period;
+    private Integer totalSlot;
+    private String activity;
+    private PeriodSession period;
 
     private Instant createdAt;
     private Instant updatedAt;
 
-    private List<UserSlot> users;
+    private List<UserSession> users;
 
     public int getAvailableSlots() {
-        return this.period.getAllowedSessions().size() - this.users.size();
+        return this.totalSlot - this.users.size();
     }
 
     public int getCurrentRegistrations() {
@@ -35,7 +36,7 @@ public class ResSlotDTO {
     @Getter
     @Setter
     @AllArgsConstructor
-    public static class UserSlot {
+    public static class UserSession {
         private long id;
         private String full_name;
     }
@@ -43,11 +44,9 @@ public class ResSlotDTO {
     @Getter
     @Setter
     @AllArgsConstructor
-    public static class PeriodSlot {
+    public static class PeriodSession {
         private long id;
         private String name;
-        private SchedulePeriodStatusEnum status;
-        private Integer peoplePerSession;
-        private Set<SessionTimeEnum> allowedSessions;
+        private PeriodStatusEnum status;
     }
 }

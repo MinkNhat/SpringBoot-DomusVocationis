@@ -1,28 +1,33 @@
 package vn.nmn.domusvocationis.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import vn.nmn.domusvocationis.util.SecurityUtil;
 import vn.nmn.domusvocationis.util.constant.SessionTimeEnum;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table(name = "schedule_slots")
+@Table(name = "sessions")
 @Getter
 @Setter
-public class ScheduleSlot {
+public class Session {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Instant registrationDate;
+    @NotNull(message = "Ngày đăng ký không được để trống")
+    @JsonFormat(pattern = "dd-MM-yyyy")
+    private LocalDate registrationDate;
+    private Integer totalSlot = 0;
+    private String activity;
 
-    @Column(columnDefinition = "MEDIUMTEXT")
-    private String notes;
-
+    @NotNull(message = "Buổi không được để trống")
     @Enumerated(EnumType.STRING)
     private SessionTimeEnum sessionTime;
 
@@ -33,15 +38,15 @@ public class ScheduleSlot {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "slot_user",
-            joinColumns = @JoinColumn(name = "slot_id"),
+            name = "session_user",
+            joinColumns = @JoinColumn(name = "session_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private List<User> users;
 
     @ManyToOne
     @JoinColumn(name = "period_id")
-    private SchedulePeriod period;
+    private Period period;
 
     @PrePersist
     public void handleBeforeCreate() {
@@ -54,25 +59,4 @@ public class ScheduleSlot {
         this.updatedBy = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
         this.updatedAt = Instant.now();
     }
-
-    public boolean isFull() {
-        return this.users.size() >= this.period.getPeoplePerSession();
-    }
-
-
-//    public boolean hasUser(User user) {
-//        return this.users.contains(user);
-//    }
-//
-//    public boolean addUser(User user) {
-//        if (isFull()) {
-//            return false;
-//        }
-//        return this.users.add(user);
-//    }
-
-//    public boolean removeUser(User user) {
-//        return this.users.remove(user);
-//    }
-
 }

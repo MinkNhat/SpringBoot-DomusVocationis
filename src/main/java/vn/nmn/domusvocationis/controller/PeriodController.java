@@ -7,38 +7,36 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import vn.nmn.domusvocationis.domain.Role;
-import vn.nmn.domusvocationis.domain.SchedulePeriod;
-import vn.nmn.domusvocationis.domain.User;
+import vn.nmn.domusvocationis.domain.Period;
 import vn.nmn.domusvocationis.domain.response.ResPaginationDTO;
-import vn.nmn.domusvocationis.domain.response.schedule.ResSlotByPeriodDTO;
-import vn.nmn.domusvocationis.service.SchedulePeriodService;
+import vn.nmn.domusvocationis.domain.response.schedule.ResSessionByPeriodDTO;
+import vn.nmn.domusvocationis.service.PeriodService;
 import vn.nmn.domusvocationis.util.annotation.ApiMessage;
 import vn.nmn.domusvocationis.util.error.IdInvalidException;
 
 @RestController
 @RequestMapping("/api/v1")
 public class PeriodController {
-    private final SchedulePeriodService periodService;
+    private final PeriodService periodService;
 
-    public PeriodController(SchedulePeriodService periodService) {
+    public PeriodController(PeriodService periodService) {
         this.periodService = periodService;
     }
 
-    @GetMapping("/periods/{id}/slots")
-    @ApiMessage("get slots by period")
-    public ResponseEntity<ResSlotByPeriodDTO> getSlotsByPeriod(@PathVariable Long id) throws IdInvalidException {
-        SchedulePeriod period = periodService.getPeriodById(id);
+    @GetMapping("/periods/{id}/sessions")
+    @ApiMessage("get sessions by period")
+    public ResponseEntity<ResSessionByPeriodDTO> getSessionsByPeriod(@PathVariable Long id) throws IdInvalidException {
+        Period period = periodService.getPeriodById(id);
         if (period == null) {
             throw new IdInvalidException("Phiên đăng ký có id = " + id + " không tồn tại");
         }
-        return ResponseEntity.ok(this.periodService.getSlotByPeriod(period));
+        return ResponseEntity.ok(this.periodService.getSessionByPeriod(period));
     }
 
     @GetMapping("/periods/{id}")
     @ApiMessage("get a period")
-    public ResponseEntity<SchedulePeriod> getPeriodById(@PathVariable Long id) throws IdInvalidException {
-        SchedulePeriod period = periodService.getPeriodById(id);
+    public ResponseEntity<Period> getPeriodById(@PathVariable Long id) throws IdInvalidException {
+        Period period = periodService.getPeriodById(id);
         if (period == null) {
             throw new IdInvalidException("Phiên đăng ký có id = " + id + " không tồn tại");
         }
@@ -47,20 +45,26 @@ public class PeriodController {
 
     @GetMapping("/periods")
     @ApiMessage("Fetch periods")
-    public ResponseEntity<ResPaginationDTO> getListPeriods(@Filter Specification<SchedulePeriod> spec, Pageable pageable) {
+    public ResponseEntity<ResPaginationDTO> getListPeriods(@Filter Specification<Period> spec, Pageable pageable) {
         return ResponseEntity.ok(this.periodService.getListPeriods(spec, pageable));
+    }
+
+    @GetMapping("/open-periods")
+    @ApiMessage("Fetch open periods")
+    public ResponseEntity<ResPaginationDTO> getOpenPeriods(Pageable pageable) {
+        return ResponseEntity.ok(this.periodService.getOpenPeriods(pageable));
     }
 
     @PostMapping("/periods")
     @ApiMessage("Create a period")
-    public ResponseEntity<SchedulePeriod> create(@Valid @RequestBody SchedulePeriod period) throws IdInvalidException {
+    public ResponseEntity<Period> create(@Valid @RequestBody Period period) throws IdInvalidException {
         return ResponseEntity.status(HttpStatus.CREATED).body(this.periodService.createPeriod(period));
     }
 
     @PutMapping("/periods")
     @ApiMessage("Update a period")
-    public ResponseEntity<SchedulePeriod> update(@Valid @RequestBody SchedulePeriod period) throws IdInvalidException {
-        SchedulePeriod dbPeriod = periodService.getPeriodById(period.getId());
+    public ResponseEntity<Period> update(@Valid @RequestBody Period period) throws IdInvalidException {
+        Period dbPeriod = periodService.getPeriodById(period.getId());
         if (dbPeriod == null) {
             throw new IdInvalidException("Phiên đăng ký có id = " + period.getId() + " không tồn tại");
         }
@@ -70,7 +74,7 @@ public class PeriodController {
     @DeleteMapping("/periods/{id}")
     @ApiMessage("Delete a period")
     public ResponseEntity<Void> delete(@PathVariable Long id) throws IdInvalidException {
-        SchedulePeriod period = periodService.getPeriodById(id);
+        Period period = periodService.getPeriodById(id);
         if (period == null) {
             throw new IdInvalidException("Phiên đăng ký có id = " + id + " không tồn tại");
         }

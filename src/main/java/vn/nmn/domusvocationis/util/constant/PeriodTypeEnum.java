@@ -1,5 +1,5 @@
 package vn.nmn.domusvocationis.util.constant;
 
-public enum ScheduleTypeEnum {
+public enum PeriodTypeEnum {
     COOKING, VACATION, OTHER
 }

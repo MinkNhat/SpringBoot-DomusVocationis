@@ -3,32 +3,36 @@ package vn.nmn.domusvocationis.domain.response.schedule;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import vn.nmn.domusvocationis.domain.ScheduleSlot;
 import vn.nmn.domusvocationis.util.constant.SessionTimeEnum;
 
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
-public class ResSlotByPeriodDTO {
+public class ResSessionByPeriodDTO {
     private Long id;
-    private List<Slot> slots;
+    private List<Session> sessions;
 
     @Getter
     @Setter
     @AllArgsConstructor
-    public static class Slot {
+    public static class Session {
         private long id;
-        private Instant registrationDate;
+        private LocalDate registrationDate;
         private SessionTimeEnum sessionTime;
-        private List<UserSlot> users;
+        private String activity;
+        private Integer totalSlot;
+        private List<UserSession> users;
+
+        public int getCurrentRegistrations() {
+            return this.users.size();
+        }
 
         @Getter
         @Setter
         @AllArgsConstructor
-        public static class UserSlot {
+        public static class UserSession {
             private long id;
             private String full_name;
         }
