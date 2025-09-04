@@ -81,9 +81,13 @@ public class User {
     @JoinColumn(name = "role_id")
     private Role role;
 
-//    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-//    @JsonIgnore
-//    private List<ScheduleSlot> scheduleSlots;
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Post> posts;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Answer> answers;
 
     @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY)
     @JsonIgnore

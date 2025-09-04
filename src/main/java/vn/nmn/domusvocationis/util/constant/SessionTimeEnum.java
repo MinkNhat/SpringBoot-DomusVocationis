@@ -5,8 +5,10 @@ import lombok.Getter;
 @Getter
 public enum SessionTimeEnum {
     MORNING("Sáng"),
-    AFTERNOON("Trưa"),
+    NOON("Trưa"),
+    AFTERNOON("Chiều"),
     EVENING("Tối"),
+    EXTRA("Thêm"),
     ALL_DAY("Cả ngày");
 
     private final String displayName;

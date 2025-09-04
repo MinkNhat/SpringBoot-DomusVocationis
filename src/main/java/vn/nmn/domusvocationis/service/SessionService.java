@@ -96,10 +96,10 @@ public class SessionService {
         String email = SecurityUtil.getCurrentUserLogin().orElse("");
         User currentUser = this.userRepository.findByEmail(email);
 
-        List<Session> userSessionsInSameDate = sessionRepository.findByPeriodAndRegistrationDateAndSessionTimeAndUsersContaining(period, session.getRegistrationDate(), session.getSessionTime(), currentUser);
-        if (!userSessionsInSameDate.isEmpty()) {
-            throw new IllegalStateException(String.format("Bạn đã đăng ký buổi %s trong ngày %s rồi", session.getSessionTime().getDisplayName().toLowerCase(), session.getRegistrationDate()));
-        }
+//        List<Session> userSessionsInSameDate = sessionRepository.findByPeriodAndRegistrationDateAndSessionTimeAndUsersContaining(period, session.getRegistrationDate(), session.getSessionTime(), currentUser);
+//        if (!userSessionsInSameDate.isEmpty()) {
+//            throw new IllegalStateException(String.format("Bạn đã đăng ký buổi %s trong ngày %s rồi", session.getSessionTime().getDisplayName().toLowerCase(), session.getRegistrationDate()));
+//        }
 
         session.getUsers().add(currentUser);
 

@@ -17,15 +17,16 @@ public class PermissionInterceptorConfiguration implements WebMvcConfigurer {
         String[] whiteList = {
                 "/", "/api/v1/auth/**", "/storage/**",
                 "/api/v1/files",
+                "/api/v1/open-periods",
 
-                //tam thoi kh check permis
-//                "/**",
-                "/api/v1/periods/**",
-                "/api/v1/periods",
+                // tạm kh check
+                "/api/v1/categories",
+                "/api/v1/posts",
+                "/api/v1/posts/**",
+
+                // giới hạn method trong security config
                 "/api/v1/sessions/**",
-                "/api/v1/sessions",
-                "/api/v1/users/bulk-create",
-                "/api/v1/open-periods"
+                "/api/v1/periods/**"
         };
         registry.addInterceptor(getPermissionInterceptor()).excludePathPatterns(whiteList);
     }

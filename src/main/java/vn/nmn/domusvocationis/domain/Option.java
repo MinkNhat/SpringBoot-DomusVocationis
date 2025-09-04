@@ -1,53 +1,41 @@
 package vn.nmn.domusvocationis.domain;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import vn.nmn.domusvocationis.util.SecurityUtil;
-import vn.nmn.domusvocationis.util.constant.SessionTimeEnum;
+import vn.nmn.domusvocationis.util.constant.*;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table(name = "sessions")
+@Table(name = "options")
 @Getter
 @Setter
-public class Session {
+public class Option {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull(message = "Ngày đăng ký không được để trống")
-    @JsonFormat(pattern = "dd-MM-yyyy")
-    private LocalDate registrationDate;
-    private Integer totalSlot = 0;
-    private String activity;
-
-    @NotNull(message = "Buổi không được để trống")
-    @Enumerated(EnumType.STRING)
-    private SessionTimeEnum sessionTime;
+    @NotBlank(message = "Lựa chọn không được để trống")
+    private String optionText;
+    private Integer orderDisplay;
 
     private Instant createdAt;
     private Instant updatedAt;
     private String createdBy;
     private String updatedBy;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "session_user",
-            joinColumns = @JoinColumn(name = "session_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private List<User> users;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "question_id", nullable = false)
+    private Question question;
 
-    @ManyToOne
-    @JoinColumn(name = "period_id")
-    private Period period;
+    @OneToMany(mappedBy = "selectedOption", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Answer> answers;
 
     @PrePersist
     public void handleBeforeCreate() {

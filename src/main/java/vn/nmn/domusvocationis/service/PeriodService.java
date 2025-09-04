@@ -80,7 +80,6 @@ public class PeriodService {
 
     public ResPaginationDTO getOpenPeriods(Pageable pageable) {
         Instant now = Instant.now();
-        System.out.println(">>> now:" + now);
 
         Specification<Period> spec = (root, query, cb) -> cb.and(
                 cb.equal(root.get("status"), PeriodStatusEnum.OPENING),
@@ -160,21 +159,21 @@ public class PeriodService {
         this.periodRepository.deleteById(id);
     }
 
-    private List<LocalDate> generateDates(LocalDate startDate, LocalDate endDate, Set<Integer> excludedDaysOfWeek) {
-        List<LocalDate> dates = new ArrayList<>();
-        LocalDate currentDate = startDate;
-
-        while (!currentDate.isAfter(endDate)) {
-            int dayValue = currentDate.getDayOfWeek().getValue() % 7; // Sunday = 0
-
-            if (!excludedDaysOfWeek.contains(dayValue)) {
-                dates.add(currentDate);
-            }
-            currentDate = currentDate.plusDays(1);
-        }
-
-        return dates;
-    }
+//    private List<LocalDate> generateDates(LocalDate startDate, LocalDate endDate, Set<Integer> excludedDaysOfWeek) {
+//        List<LocalDate> dates = new ArrayList<>();
+//        LocalDate currentDate = startDate;
+//
+//        while (!currentDate.isAfter(endDate)) {
+//            int dayValue = currentDate.getDayOfWeek().getValue() % 7; // Sunday = 0
+//
+//            if (!excludedDaysOfWeek.contains(dayValue)) {
+//                dates.add(currentDate);
+//            }
+//            currentDate = currentDate.plusDays(1);
+//        }
+//
+//        return dates;
+//    }
 
 //    @Scheduled(cron = "0 0 0 * * ?") // Run daily at midnight
 //    public void updatePeriodStatus() {

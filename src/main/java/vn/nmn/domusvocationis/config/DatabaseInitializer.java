@@ -53,12 +53,24 @@ public class DatabaseInitializer implements CommandLineRunner {
             arr.add(new Permission("Delete a user", "/api/v1/users/{id}", "DELETE", "USERS"));
             arr.add(new Permission("Get a user by id", "/api/v1/users/{id}", "GET", "USERS"));
             arr.add(new Permission("Get users with pagination", "/api/v1/users", "GET", "USERS"));
+            arr.add(new Permission("Create-bulk users", "/api/v1/users/bulk-create", "POST", "USERS"));
 
             arr.add(new Permission("Create a period", "/api/v1/periods", "POST", "PERIODS"));
             arr.add(new Permission("Update a period", "/api/v1/periods", "PUT", "PERIODS"));
             arr.add(new Permission("Delete a period", "/api/v1/periods/{id}", "DELETE", "PERIODS"));
             arr.add(new Permission("Get a period by id", "/api/v1/periods/{id}", "GET", "PERIODS"));
             arr.add(new Permission("Get periods with pagination", "/api/v1/periods", "GET", "PERIODS"));
+            arr.add(new Permission("Get sessions by periods", "/api/v1/periods/{id}/sessions", "GET", "PERIODS"));
+
+            arr.add(new Permission("Create a session", "/api/v1/sessions", "POST", "SESSIONS"));
+//            arr.add(new Permission("Update a session", "/api/v1/sessions", "PUT", "SESSIONS"));
+            arr.add(new Permission("Get a session by id", "/api/v1/sessions/{id}", "GET", "SESSIONS"));
+
+            arr.add(new Permission("Create a category", "/api/v1/categories", "POST", "CATEGORIES"));
+            arr.add(new Permission("Update a category", "/api/v1/categories", "PUT", "CATEGORIES"));
+            arr.add(new Permission("Delete a category", "/api/v1/categories/{id}", "DELETE", "CATEGORIES"));
+            arr.add(new Permission("Get a category by id", "/api/v1/categories/{id}", "GET", "CATEGORIES"));
+            arr.add(new Permission("Get categories with pagination", "/api/v1/categories", "GET", "CATEGORIES"));
 
             arr.add(new Permission("Download a file", "/api/v1/files", "POST", "FILES"));
             arr.add(new Permission("Upload a file", "/api/v1/files", "GET", "FILES"));

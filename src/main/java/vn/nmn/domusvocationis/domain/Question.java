@@ -1,53 +1,51 @@
 package vn.nmn.domusvocationis.domain;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import vn.nmn.domusvocationis.util.SecurityUtil;
-import vn.nmn.domusvocationis.util.constant.SessionTimeEnum;
+import vn.nmn.domusvocationis.util.constant.*;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table(name = "sessions")
+@Table(name = "questions")
 @Getter
 @Setter
-public class Session {
+public class Question {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull(message = "Ngày đăng ký không được để trống")
-    @JsonFormat(pattern = "dd-MM-yyyy")
-    private LocalDate registrationDate;
-    private Integer totalSlot = 0;
-    private String activity;
+    @NotBlank(message = "Câu hỏi không được để trống")
+    private String questionText;
 
-    @NotNull(message = "Buổi không được để trống")
-    @Enumerated(EnumType.STRING)
-    private SessionTimeEnum sessionTime;
+    @NotBlank(message = "Loại câu hỏi không được để trống")
+    private QuestionTypeEnum type;
+
+    private Integer orderDisplay;
+    private Boolean required = false;
+    private Boolean allowMultiple = false;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post;
+
+    @OneToMany(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Option> options;
+
+    @OneToMany(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Answer> answers;
 
     private Instant createdAt;
     private Instant updatedAt;
     private String createdBy;
     private String updatedBy;
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "session_user",
-            joinColumns = @JoinColumn(name = "session_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private List<User> users;
-
-    @ManyToOne
-    @JoinColumn(name = "period_id")
-    private Period period;
 
     @PrePersist
     public void handleBeforeCreate() {

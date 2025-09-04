@@ -55,6 +55,10 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(
                         authz -> authz
                                 .requestMatchers(whiteList).permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/categories").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/posts").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/periods/{id}").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/sessions/{id}").permitAll()
                                 .anyRequest().authenticated())
                 .oauth2ResourceServer(
                         (oauth2) -> oauth2
