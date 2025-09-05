@@ -21,7 +21,7 @@ public class CategoryService {
         this.postRepository = postRepository;
     }
 
-        public Category getCategoryById(Long id) {
+    public Category getCategoryById(Long id) {
         return this.categoryRepository.findById(id).orElse(null);
     }
 

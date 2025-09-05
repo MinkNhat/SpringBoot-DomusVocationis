@@ -9,7 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vn.nmn.domusvocationis.domain.Post;
+import vn.nmn.domusvocationis.domain.request.ReqCreateSurveyBulkDTO;
 import vn.nmn.domusvocationis.domain.response.ResPaginationDTO;
+import vn.nmn.domusvocationis.domain.response.post.ResGetPostByIdDTO;
 import vn.nmn.domusvocationis.domain.response.post.ResPostDTO;
 import vn.nmn.domusvocationis.service.PostService;
 import vn.nmn.domusvocationis.util.annotation.ApiMessage;
@@ -26,12 +28,12 @@ public class PostController {
 
     @GetMapping("/posts/{id}")
     @ApiMessage("get a post")
-    public ResponseEntity<ResPostDTO> getPostById(@PathVariable Long id) throws IdInvalidException {
+    public ResponseEntity<ResGetPostByIdDTO> getPostById(@PathVariable Long id) throws IdInvalidException {
         Post post = postService.getPostById(id);
         if (post == null) {
             throw new IdInvalidException("Bài viết có id = " + id + " không tồn tại");
         }
-        return ResponseEntity.ok(this.postService.convertToResPostDTO(post));
+        return ResponseEntity.ok(this.postService.convertToResGetPostByIdDTO(post));
     }
 
     @GetMapping("/posts")
@@ -47,6 +49,14 @@ public class PostController {
 
         Post p = this.postService.create(post);
         return ResponseEntity.status(HttpStatus.CREATED).body(this.postService.convertToResPostDTO(p));
+    }
+
+    @PostMapping("/posts/survey-bulk")
+    @ApiMessage("Create a survey post ( with questions and options )")
+    public ResponseEntity<ResPostDTO> createBulkSurvey(@Valid @RequestBody ReqCreateSurveyBulkDTO request) {
+        Post createdPost = this.postService.createBulkSurvey(request);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.postService.convertToResPostDTO(createdPost));
     }
 
     @PutMapping("/posts")

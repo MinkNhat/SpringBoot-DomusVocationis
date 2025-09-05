@@ -3,6 +3,7 @@ package vn.nmn.domusvocationis.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import vn.nmn.domusvocationis.util.SecurityUtil;
@@ -23,7 +24,7 @@ public class Question {
     @NotBlank(message = "Câu hỏi không được để trống")
     private String questionText;
 
-    @NotBlank(message = "Loại câu hỏi không được để trống")
+    @NotNull(message = "Loại câu hỏi không được để trống")
     private QuestionTypeEnum type;
 
     private Integer orderDisplay;

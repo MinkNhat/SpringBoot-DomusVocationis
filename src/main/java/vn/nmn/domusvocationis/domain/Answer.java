@@ -2,11 +2,13 @@ package vn.nmn.domusvocationis.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import vn.nmn.domusvocationis.util.SecurityUtil;
 
 import java.time.Instant;
+import java.util.List;
 
 @Entity
 @Table(name = "answers")
@@ -20,6 +22,7 @@ public class Answer {
     @Column(columnDefinition = "TEXT")
     private String answerText;
 
+    @NotNull(message = "Câu hỏi không được để trống")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id", nullable = false)
     private Question question;
@@ -28,10 +31,13 @@ public class Answer {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "option_id")
-    private Option selectedOption;
-
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "answer_options",
+            joinColumns = @JoinColumn(name = "answer_id"),
+            inverseJoinColumns = @JoinColumn(name = "option_id")
+    )
+    private List<Option> selectedOptions;
 
     private Instant createdAt;
     private Instant updatedAt;

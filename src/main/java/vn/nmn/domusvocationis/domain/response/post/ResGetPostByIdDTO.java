@@ -1,12 +1,8 @@
 package vn.nmn.domusvocationis.domain.response.post;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import vn.nmn.domusvocationis.domain.request.ReqCreateSurveyBulkDTO;
 import vn.nmn.domusvocationis.util.constant.PostStatusEnum;
 import vn.nmn.domusvocationis.util.constant.PostTypeEnum;
 import vn.nmn.domusvocationis.util.constant.QuestionTypeEnum;
@@ -16,7 +12,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class ResPostDTO {
+public class ResGetPostByIdDTO {
     private Long id;
     private String title;
     private String content;
@@ -31,6 +27,9 @@ public class ResPostDTO {
 
     private UserPost user;
     private CategoryPost category;
+    private List<QuestionPost> questions;
+
+    private boolean isSubmitted;
 
 
     @Getter
@@ -49,4 +48,25 @@ public class ResPostDTO {
         private long id;
         private String name;
     }
+
+    @Getter
+    @Setter
+    public static class QuestionPost {
+        private long id;
+        private String questionText;
+        private QuestionTypeEnum type;
+        private Integer orderDisplay;
+        private Boolean required = false;
+        private Boolean allowMultiple = false;
+        private List<OptionQuestion> options;
+    }
+
+    @Getter
+    @Setter
+    public static class OptionQuestion {
+        private long id;
+        private String optionText;
+        private Integer orderDisplay;
+    }
 }
+

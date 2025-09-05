@@ -33,7 +33,7 @@ public class Option {
     @JoinColumn(name = "question_id", nullable = false)
     private Question question;
 
-    @OneToMany(mappedBy = "selectedOption", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "selectedOptions", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Answer> answers;
 

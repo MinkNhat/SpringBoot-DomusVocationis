@@ -23,6 +23,9 @@ public class PermissionInterceptorConfiguration implements WebMvcConfigurer {
                 "/api/v1/categories",
                 "/api/v1/posts",
                 "/api/v1/posts/**",
+                "/api/v1/questions",
+                "/api/v1/questions/**",
+                "/api/v1/answers",
 
                 // giới hạn method trong security config
                 "/api/v1/sessions/**",
