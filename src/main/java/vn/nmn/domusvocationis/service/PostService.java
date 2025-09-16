@@ -84,8 +84,9 @@ public class PostService {
 
         String email = SecurityUtil.getCurrentUserLogin().orElse("");
         User currentUser = this.userRepository.findByEmail(email);
-        res.setSubmitted(answerRepository.existsByQuestion_Post_IdAndUser_Id(post.getId(), currentUser.getId()));
-
+        if(currentUser != null) {
+            res.setSubmitted(answerRepository.existsByQuestion_Post_IdAndUser_Id(post.getId(), currentUser.getId()));
+        }
 
         if(post.getUser() != null) {
             ResGetPostByIdDTO.UserPost user = new ResGetPostByIdDTO.UserPost(post.getUser().getId(), post.getUser().getFullName(), post.getUser().getAvatar());

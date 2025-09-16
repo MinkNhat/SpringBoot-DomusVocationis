@@ -46,7 +46,8 @@ public class SecurityConfiguration {
                 "/storage/**",
                 "/v3/api-docs/**",
                 "/swagger-ui/**",
-                "/swagger-ui.html"
+                "/swagger-ui.html",
+                "/api/v1/payments/vn-pay-ipn",
         };
 
         http
@@ -57,6 +58,8 @@ public class SecurityConfiguration {
                                 .requestMatchers(whiteList).permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/categories").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/posts").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/posts/{id}").permitAll()
+
                                 .requestMatchers(HttpMethod.GET, "/api/v1/periods/{id}").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/sessions/{id}").permitAll()
                                 .anyRequest().authenticated())

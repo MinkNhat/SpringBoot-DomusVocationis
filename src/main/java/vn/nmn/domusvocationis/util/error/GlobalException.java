@@ -128,6 +128,18 @@ public class GlobalException {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
 
+    @ExceptionHandler(value = {
+            PaymentException.class
+    })
+    public ResponseEntity<RestResponse<Object>> handlePaymentException(Exception ex) {
+        RestResponse<Object> res = new RestResponse<>();
+        res.setStatusCode(HttpStatus.BAD_REQUEST.value());
+        res.setMessage(ex.getMessage());
+        res.setError("Lỗi chữ ký khi thanh toán");
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<RestResponse<Object>> handleAllException(Exception ex) {
         RestResponse<Object> res = new RestResponse<Object>();

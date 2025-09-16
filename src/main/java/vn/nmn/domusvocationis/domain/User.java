@@ -52,7 +52,7 @@ public class User {
 
     private String avatar;
     private String address;
-    private boolean active;
+    private boolean active = true;
     private Integer team;
 
     private String fatherName;
@@ -92,6 +92,15 @@ public class User {
     @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Session> sessions;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<FeeRegistration> feeRegistrations;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Payment> payments;
+
 
     @PrePersist
     public void handleBeforeCreate() {

@@ -72,6 +72,12 @@ public class DatabaseInitializer implements CommandLineRunner {
             arr.add(new Permission("Get a category by id", "/api/v1/categories/{id}", "GET", "CATEGORIES"));
             arr.add(new Permission("Get categories with pagination", "/api/v1/categories", "GET", "CATEGORIES"));
 
+            arr.add(new Permission("Create a fee type", "/api/v1/fee-types", "POST", "FEE_TYPES"));
+            arr.add(new Permission("Update a fee type", "/api/v1/fee-types", "PUT", "FEE_TYPES"));
+            arr.add(new Permission("Delete a fee type", "/api/v1/fee-types/{id}", "DELETE", "FEE_TYPES"));
+            arr.add(new Permission("Get a fee type by id", "/api/v1/fee-types/{id}", "GET", "FEE_TYPES"));
+            arr.add(new Permission("Get fee types with pagination", "/api/v1/fee-types", "GET", "FEE_TYPES"));
+
             arr.add(new Permission("Download a file", "/api/v1/files", "POST", "FILES"));
             arr.add(new Permission("Upload a file", "/api/v1/files", "GET", "FILES"));
 
