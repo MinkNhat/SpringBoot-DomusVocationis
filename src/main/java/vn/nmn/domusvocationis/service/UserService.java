@@ -6,17 +6,20 @@ import jakarta.validation.Validator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.nmn.domusvocationis.domain.Permission;
 import vn.nmn.domusvocationis.domain.Role;
 import vn.nmn.domusvocationis.domain.User;
+import vn.nmn.domusvocationis.domain.request.user.ReqChangePasswordUser;
 import vn.nmn.domusvocationis.domain.response.user.ResBulkCreateUserDTO;
 import vn.nmn.domusvocationis.domain.response.user.ResCreateUserDTO;
 import vn.nmn.domusvocationis.domain.response.ResPaginationDTO;
 import vn.nmn.domusvocationis.domain.response.user.ResUpdateUserDTO;
 import vn.nmn.domusvocationis.domain.response.user.ResUserDTO;
 import vn.nmn.domusvocationis.repository.UserRepository;
+import vn.nmn.domusvocationis.util.error.IdInvalidException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,10 +30,17 @@ import java.util.Set;
 public class UserService {
     private final UserRepository userRepository;
     private final RoleService roleService;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, RoleService roleService) {
+    public UserService(UserRepository userRepository, RoleService roleService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleService = roleService;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    private boolean isValidPassword(String password) {
+        String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$";
+        return password != null && password.matches(regex);
     }
 
     @Transactional(readOnly = true)
@@ -251,6 +261,25 @@ public class UserService {
     public void delete(Long id) {
         this.userRepository.deleteById(id);
     }
+
+    public void changePassword(ReqChangePasswordUser req, User user) throws IdInvalidException {
+        if (!this.passwordEncoder.matches(req.getOldPassword(), user.getPassword())) {
+            throw new IdInvalidException("Mật khẩu cũ không chính xác");
+        }
+
+        if (this.passwordEncoder.matches(req.getNewPassword(), user.getPassword())) {
+            throw new IdInvalidException("Mật khẩu mới không được trùng với mật khẩu cũ");
+        }
+
+        if (!isValidPassword(req.getNewPassword())) {
+            throw new IdInvalidException("Mật khẩu mới không hợp lệ (Phải có >= 8 ký tự bao gồm chữ hoa, chữ thường và chữ số)");
+        }
+
+        user.setPassword(this.passwordEncoder.encode(req.getNewPassword()));
+        this.userRepository.save(user);
+    }
+
+
 
 
 }

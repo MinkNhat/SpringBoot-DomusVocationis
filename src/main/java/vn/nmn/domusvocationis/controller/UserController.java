@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import vn.nmn.domusvocationis.domain.User;
+import vn.nmn.domusvocationis.domain.request.user.ReqChangePasswordUser;
 import vn.nmn.domusvocationis.domain.response.user.ResBulkCreateUserDTO;
 import vn.nmn.domusvocationis.domain.response.user.ResCreateUserDTO;
 import vn.nmn.domusvocationis.domain.response.ResPaginationDTO;
@@ -91,6 +92,16 @@ public class UserController {
         if(currentUser == null) throw new IdInvalidException("User có ID = " + reqUser.getId() + " không tồn tại");
 
         return ResponseEntity.ok(this.userService.convertToResUpdateUserDTO(currentUser));
+    }
+
+    @PatchMapping("/users/change-password/{id}")
+    @ApiMessage("Update a password")
+    public ResponseEntity<ResUpdateUserDTO> updatePasswordUser(@PathVariable Long id, @Valid @RequestBody ReqChangePasswordUser req) throws IdInvalidException {
+        User currentUser = this.userService.getUserById(id);
+        if(currentUser == null) throw new IdInvalidException("User có ID = " + id + " không tồn tại");
+
+        this.userService.changePassword(req, currentUser);
+        return ResponseEntity.ok(null);
     }
 
     @DeleteMapping("/users/{id}")

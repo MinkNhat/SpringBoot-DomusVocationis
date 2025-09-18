@@ -23,7 +23,7 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
     }
 
-    public ResPaginationDTO getListPayments(Specification<Payment> spec, Pageable pageable, Long userId) {
+    public ResPaginationDTO getListPaymentsByUser(Specification<Payment> spec, Pageable pageable, Long userId) {
         Specification<Payment> byUserId = null;
         if (userId != null) {
             byUserId = (root, query, cb) -> {
@@ -34,6 +34,24 @@ public class PaymentService {
 
         Specification<Payment> finalSpec = Specification.where(byUserId).and(spec);
         Page<Payment> page = this.paymentRepository.findAll(finalSpec, pageable);
+
+        ResPaginationDTO rs = new ResPaginationDTO();
+        ResPaginationDTO.Meta mt = new ResPaginationDTO.Meta();
+
+        mt.setPage(pageable.getPageNumber() + 1);
+        mt.setPageSize(pageable.getPageSize());
+
+        mt.setPages(page.getTotalPages());
+        mt.setTotal(page.getTotalElements());
+
+        rs.setMeta(mt);
+        rs.setResult(page.getContent());
+
+        return rs;
+    }
+
+    public ResPaginationDTO getListPayments(Specification<Payment> spec, Pageable pageable) {
+        Page<Payment> page = this.paymentRepository.findAll(spec, pageable);
 
         ResPaginationDTO rs = new ResPaginationDTO();
         ResPaginationDTO.Meta mt = new ResPaginationDTO.Meta();

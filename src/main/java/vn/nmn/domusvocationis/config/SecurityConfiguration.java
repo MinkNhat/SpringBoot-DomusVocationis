@@ -62,6 +62,9 @@ public class SecurityConfiguration {
 
                                 .requestMatchers(HttpMethod.GET, "/api/v1/periods/{id}").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/sessions/{id}").permitAll()
+
+                                .requestMatchers(HttpMethod.GET, "/api/v1/users/{id}").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/fee-types").permitAll()
                                 .anyRequest().authenticated())
                 .oauth2ResourceServer(
                         (oauth2) -> oauth2

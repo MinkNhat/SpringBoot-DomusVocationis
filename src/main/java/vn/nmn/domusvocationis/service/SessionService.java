@@ -1,9 +1,16 @@
 package vn.nmn.domusvocationis.service;
 
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import vn.nmn.domusvocationis.domain.Period;
+import vn.nmn.domusvocationis.domain.Post;
 import vn.nmn.domusvocationis.domain.Session;
 import vn.nmn.domusvocationis.domain.User;
+import vn.nmn.domusvocationis.domain.response.ResPaginationDTO;
 import vn.nmn.domusvocationis.domain.response.schedule.ResSessionDTO;
 import vn.nmn.domusvocationis.repository.PeriodRepository;
 import vn.nmn.domusvocationis.repository.SessionRepository;
@@ -32,6 +39,33 @@ public class SessionService {
 
     public Session getSessionById(Long id) {
         return this.sessionRepository.findById(id).orElse(null);
+    }
+
+    public ResPaginationDTO getListSessionsByUser(Specification<Session> spec, Pageable pageable, Long userId) {
+        Specification<Session> userSessions = (root, query, cb) -> {
+            query.distinct(true);
+            Join<Session, User> usersJoin = root.join("users", JoinType.INNER);
+            return cb.equal(usersJoin.get("id"), userId);
+        };
+        Specification<Session> finalSpec = (spec == null) ? userSessions : spec.and(userSessions);
+
+
+        Page<Session> page = this.sessionRepository.findAll(finalSpec, pageable);
+        ResPaginationDTO rs = new ResPaginationDTO();
+        ResPaginationDTO.Meta mt = new ResPaginationDTO.Meta();
+
+        mt.setPage(pageable.getPageNumber() + 1);
+        mt.setPageSize(pageable.getPageSize());
+
+        mt.setPages(page.getTotalPages());
+        mt.setTotal(page.getTotalElements());
+
+        rs.setMeta(mt);
+
+        List<ResSessionDTO> result = page.getContent().stream().map(s -> convertToResSessionDTO(s)).toList();
+        rs.setResult(result);
+
+        return rs;
     }
 
     public ResSessionDTO convertToResSessionDTO(Session session) {

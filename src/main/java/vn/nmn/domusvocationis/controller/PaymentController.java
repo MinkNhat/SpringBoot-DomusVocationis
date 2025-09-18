@@ -42,7 +42,6 @@ public class PaymentController {
     public ResponseEntity<ResPaymentDTO> pay(@RequestBody ReqPaymentDTO request, HttpServletRequest httpServletRequest) throws PaymentException {
         String ipAddress = VNPayUtil.getIpAddress(httpServletRequest);
         request.setIpAddress(ipAddress);
-        log.info("[VNPay payment] Params: {}", "Toi da o day");
 
         return ResponseEntity.ok(VNPayService.init(request));
     }
@@ -55,12 +54,18 @@ public class PaymentController {
 
     @GetMapping("/users/{id}/payments")
     @ApiMessage("Fetch payments by user")
-    public ResponseEntity<ResPaginationDTO> getListFeeTypesByUserId(@PathVariable Long id, @Filter Specification<Payment> spec, Pageable pageable) throws IdInvalidException {
+    public ResponseEntity<ResPaginationDTO> getPaymentsByUserId(@PathVariable Long id, @Filter Specification<Payment> spec, Pageable pageable) throws IdInvalidException {
         User user = userService.getUserById(id);
         if(user == null) {
             throw new IdInvalidException("User có id = " + id + " không tồn tại");
         }
 
-        return ResponseEntity.ok(this.paymentService.getListPayments(spec, pageable, user.getId()));
+        return ResponseEntity.ok(this.paymentService.getListPaymentsByUser(spec, pageable, user.getId()));
+    }
+
+    @GetMapping("/payments")
+    @ApiMessage("Fetch active payments")
+    public ResponseEntity<ResPaginationDTO> getListPayments(@Filter Specification<Payment> spec, Pageable pageable) {
+        return ResponseEntity.ok(this.paymentService.getListPayments(spec, pageable));
     }
 }

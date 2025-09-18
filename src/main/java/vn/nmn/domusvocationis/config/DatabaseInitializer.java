@@ -63,7 +63,6 @@ public class DatabaseInitializer implements CommandLineRunner {
             arr.add(new Permission("Get sessions by periods", "/api/v1/periods/{id}/sessions", "GET", "PERIODS"));
 
             arr.add(new Permission("Create a session", "/api/v1/sessions", "POST", "SESSIONS"));
-//            arr.add(new Permission("Update a session", "/api/v1/sessions", "PUT", "SESSIONS"));
             arr.add(new Permission("Get a session by id", "/api/v1/sessions/{id}", "GET", "SESSIONS"));
 
             arr.add(new Permission("Create a category", "/api/v1/categories", "POST", "CATEGORIES"));
@@ -80,6 +79,8 @@ public class DatabaseInitializer implements CommandLineRunner {
 
             arr.add(new Permission("Download a file", "/api/v1/files", "POST", "FILES"));
             arr.add(new Permission("Upload a file", "/api/v1/files", "GET", "FILES"));
+
+            arr.add(new Permission("Get active payments", "/api/v1/payments", "GET", "PAYMENTS"));
 
             this.permissionRepository.saveAll(arr);
         }
