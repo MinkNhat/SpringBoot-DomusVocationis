@@ -278,8 +278,4 @@ public class UserService {
         user.setPassword(this.passwordEncoder.encode(req.getNewPassword()));
         this.userRepository.save(user);
     }
-
-
-
-
 }

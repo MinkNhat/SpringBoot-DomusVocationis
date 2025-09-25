@@ -1,5 +1,9 @@
 package vn.nmn.domusvocationis.service;
 
+import lombok.extern.slf4j.Slf4j;
+import org.quartz.SchedulerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -10,6 +14,7 @@ import vn.nmn.domusvocationis.domain.response.schedule.ResSessionByPeriodDTO;
 import vn.nmn.domusvocationis.repository.PeriodRepository;
 import vn.nmn.domusvocationis.repository.SessionRepository;
 import vn.nmn.domusvocationis.repository.UserRepository;
+import vn.nmn.domusvocationis.schedule.trigger.QuartzSchedulerService;
 import vn.nmn.domusvocationis.util.DateTimeUtil;
 import vn.nmn.domusvocationis.util.constant.PeriodStatusEnum;
 import vn.nmn.domusvocationis.util.constant.SessionTimeEnum;
@@ -23,17 +28,18 @@ import java.util.List;
 import java.util.Set;
 
 @Service
+@Slf4j
 public class PeriodService {
     private final PeriodRepository periodRepository;
 
     private final SessionRepository slotRepository;
 
-    private final UserRepository userRepository;
+    private final QuartzSchedulerService quartzSchedulerService;
 
-    public PeriodService(PeriodRepository periodRepository, SessionRepository slotRepository, UserRepository userRepository, DateTimeUtil dateTimeUtil) {
+    public PeriodService(PeriodRepository periodRepository, SessionRepository slotRepository, QuartzSchedulerService quartzSchedulerService) {
         this.periodRepository = periodRepository;
         this.slotRepository = slotRepository;
-        this.userRepository = userRepository;
+        this.quartzSchedulerService = quartzSchedulerService;
     }
 
     public ResSessionByPeriodDTO getSessionByPeriod(Period period) {
@@ -124,7 +130,17 @@ public class PeriodService {
         if(period.getName() == null || period.getName().isEmpty())
             period.setName(String.format("Phiên %s (%s -> %s)", period.getType(), period.getStartDate(), period.getEndDate()));
 
-        return this.periodRepository.save(period);
+        Period savedPeriod = this.periodRepository.save(period);
+
+        //quartz job
+        try {
+            quartzSchedulerService.scheduleOpenPeriodJob(savedPeriod.getId());
+            quartzSchedulerService.scheduleClosePeriodJob(savedPeriod.getId());
+        } catch (SchedulerException e) {
+            throw new RuntimeException("Failed to schedule close job", e);
+        }
+
+        return savedPeriod;
     }
 
     public Period updatePeriod(Period period, Period dbPeriod) throws IdInvalidException {
@@ -150,30 +166,29 @@ public class PeriodService {
             throw new IdInvalidException(String.format("Thời gian bắt đầu đăng ký (%s) phải nhỏ hơn thời gian kết thúc (%s)", dbPeriod.getRegistrationStartTime(), dbPeriod.getRegistrationEndTime()));
         }
 
-        return this.periodRepository.save(dbPeriod);
+        Period savedPeriod = this.periodRepository.save(dbPeriod);
+
+        // quartz job
+        try {
+            quartzSchedulerService.scheduleOpenPeriodJob(savedPeriod.getId());
+            quartzSchedulerService.scheduleClosePeriodJob(savedPeriod.getId());
+        } catch (SchedulerException e) {
+            throw new RuntimeException("Failed to reschedule close job", e);
+        }
+
+        return savedPeriod;
     }
 
     public void deletePeriod(Long id) {
+        try {
+            quartzSchedulerService.deletePeriodJobs(id);
+        } catch (SchedulerException e) {
+            // Log warning
+        }
+
         Period period = this.periodRepository.findById(id).orElse(null);
         this.slotRepository.deleteByPeriod(period);
         this.periodRepository.deleteById(id);
     }
-
-
-//    @Scheduled(cron = "0 0 0 * * ?") // Run daily at midnight
-//    public void updatePeriodStatus() {
-//        List<SchedulePeriod> periods = periodRepository.findAll();
-//        Instant now = Instant.now();
-//
-//        for (SchedulePeriod period : periods) {
-//            if (period.getStatus() == SchedulePeriodStatusEnum.PENDING && now.isAfter(period.getStartDate())) {
-//                period.setStatus(SchedulePeriodStatusEnum.OPENING);
-//                periodRepository.save(period);
-//            } else if (period.getStatus() == SchedulePeriodStatusEnum.OPENING && now.isAfter(period.getEndDate())) {
-//                period.setStatus(SchedulePeriodStatusEnum.CLOSED);
-//                periodRepository.save(period);
-//            }
-//        }
-//    }
 
 }

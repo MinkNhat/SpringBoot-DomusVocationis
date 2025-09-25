@@ -13,7 +13,9 @@ import vn.nmn.domusvocationis.domain.request.ReqCreateSurveyBulkDTO;
 import vn.nmn.domusvocationis.domain.response.ResPaginationDTO;
 import vn.nmn.domusvocationis.domain.response.post.ResGetPostByIdDTO;
 import vn.nmn.domusvocationis.domain.response.post.ResPostDTO;
+import vn.nmn.domusvocationis.domain.response.post.ResSurveyStatsDTO;
 import vn.nmn.domusvocationis.service.PostService;
+import vn.nmn.domusvocationis.service.SurveyStatsService;
 import vn.nmn.domusvocationis.util.annotation.ApiMessage;
 import vn.nmn.domusvocationis.util.error.IdInvalidException;
 
@@ -21,9 +23,11 @@ import vn.nmn.domusvocationis.util.error.IdInvalidException;
 @RequestMapping("/api/v1")
 public class PostController {
     private final PostService postService;
+    private final SurveyStatsService surveyStatsService;
 
-    public PostController(PostService postService) {
+    public PostController(PostService postService, SurveyStatsService surveyStatsService) {
         this.postService = postService;
+        this.surveyStatsService = surveyStatsService;
     }
 
     @GetMapping("/posts/{id}")
@@ -83,5 +87,10 @@ public class PostController {
 
         this.postService.delete(id);
         return ResponseEntity.ok(null);
+    }
+
+    @GetMapping("/posts/{id}/stats")
+    public ResponseEntity<ResSurveyStatsDTO> postStats(@PathVariable Long id) throws IdInvalidException {
+        return ResponseEntity.ok(surveyStatsService.getChartStats(id));
     }
 }

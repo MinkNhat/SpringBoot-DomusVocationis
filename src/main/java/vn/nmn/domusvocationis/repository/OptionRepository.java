@@ -11,5 +11,5 @@ import java.util.List;
 @Repository
 public interface OptionRepository extends JpaRepository<Option, Long>, JpaSpecificationExecutor<Option> {
     List<Option> findByIdIn(List<Long> id);
-
+    List<Option> findByQuestionIdOrderByOrderDisplay(Long question_id);
 }

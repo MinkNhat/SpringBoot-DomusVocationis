@@ -10,6 +10,7 @@ import vn.nmn.domusvocationis.repository.UserRepository;
 import vn.nmn.domusvocationis.util.SecurityUtil;
 import vn.nmn.domusvocationis.util.error.IdInvalidException;
 
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -54,6 +55,11 @@ public class AnswerService {
     public Answer create(Answer answer) throws IdInvalidException {
         Question question = this.questionRepository.findById(answer.getQuestion().getId()).orElse(null);
         if(question == null) throw new IdInvalidException("Câu hỏi có id = " + answer.getQuestion().getId() + " không tồn tại");
+
+        Instant now = Instant.now();
+        if(now.isAfter(question.getPost().getExpiresAt())) {
+            throw new IdInvalidException("Đã hết hạn trả lời câu hỏi");
+        }
 
         if(answer.getSelectedOptions() != null) {
             List<Long> reqOpt = answer.getSelectedOptions().stream().map(p -> p.getId()).toList();

@@ -21,16 +21,16 @@ import java.util.Set;
 @Table(name = "periods")
 @Getter
 @Setter
-@ChronologicalDates(
-        startField = "registrationStartTime",
-        endField = "registrationEndTime",
-        message = "Thời gian đăng ký không hợp lệ"
-)
-@ChronologicalDates(
-        startField = "startDate",
-        endField = "endDate",
-        message = "Thời gian thực hiện không hợp lệ"
-)
+//@ChronologicalDates(
+//        startField = "registrationStartTime",
+//        endField = "registrationEndTime",
+//        message = "Thời gian đăng ký không hợp lệ"
+//)
+//@ChronologicalDates(
+//        startField = "startDate",
+//        endField = "endDate",
+//        message = "Thời gian thực hiện không hợp lệ"
+//)
 //@ChronologicalDates(
 //        startField = "registrationStartTime",
 //        endField = "startDate",

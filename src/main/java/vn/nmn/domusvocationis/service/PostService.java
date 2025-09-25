@@ -242,6 +242,7 @@ public class PostService {
         if(dbPost != null) {
             dbPost.setTitle(r.getTitle());
             dbPost.setContent(r.getContent());
+            dbPost.setPublicPost(r.getPublicPost());
 
             return this.postRepository.save(dbPost);
         }
