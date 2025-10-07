@@ -13,6 +13,7 @@ import vn.nmn.domusvocationis.domain.Permission;
 import vn.nmn.domusvocationis.domain.Role;
 import vn.nmn.domusvocationis.domain.User;
 import vn.nmn.domusvocationis.domain.request.user.ReqChangePasswordUser;
+import vn.nmn.domusvocationis.domain.request.user.ReqUpdateAvatarDTO;
 import vn.nmn.domusvocationis.domain.response.user.ResBulkCreateUserDTO;
 import vn.nmn.domusvocationis.domain.response.user.ResCreateUserDTO;
 import vn.nmn.domusvocationis.domain.response.ResPaginationDTO;
@@ -213,7 +214,6 @@ public class UserService {
             currentUser.setPhone(user.getPhone());
             currentUser.setGender(user.getGender());
             currentUser.setBirth(user.getBirth());
-            currentUser.setAvatar(user.getAvatar());
             currentUser.setAddress(user.getAddress());
             currentUser.setActive(user.isActive());
             currentUser.setTeam(user.getTeam());
@@ -276,6 +276,11 @@ public class UserService {
         }
 
         user.setPassword(this.passwordEncoder.encode(req.getNewPassword()));
+        this.userRepository.save(user);
+    }
+
+    public void changeAvatar(ReqUpdateAvatarDTO req, User user) {
+        user.setAvatar("avatar/" + req.getFileName());
         this.userRepository.save(user);
     }
 }

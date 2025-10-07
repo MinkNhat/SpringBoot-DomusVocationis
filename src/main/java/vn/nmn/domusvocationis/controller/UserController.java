@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import vn.nmn.domusvocationis.domain.User;
 import vn.nmn.domusvocationis.domain.request.user.ReqChangePasswordUser;
+import vn.nmn.domusvocationis.domain.request.user.ReqUpdateAvatarDTO;
 import vn.nmn.domusvocationis.domain.response.user.ResBulkCreateUserDTO;
 import vn.nmn.domusvocationis.domain.response.user.ResCreateUserDTO;
 import vn.nmn.domusvocationis.domain.response.ResPaginationDTO;
@@ -101,6 +102,17 @@ public class UserController {
         if(currentUser == null) throw new IdInvalidException("User có ID = " + id + " không tồn tại");
 
         this.userService.changePassword(req, currentUser);
+        return ResponseEntity.ok(null);
+    }
+
+    @PatchMapping("/users/upload-avatar/{id}")
+    @ApiMessage("Update a avatar")
+    public ResponseEntity<ResUpdateUserDTO> updateAvatarUser(@PathVariable Long id, @Valid @RequestBody ReqUpdateAvatarDTO req) throws IdInvalidException {
+        User currentUser = this.userService.getUserById(id);
+        if(currentUser == null) throw new IdInvalidException("User có ID = " + id + " không tồn tại");
+        System.out.println(req);
+
+        this.userService.changeAvatar(req, currentUser);
         return ResponseEntity.ok(null);
     }
 

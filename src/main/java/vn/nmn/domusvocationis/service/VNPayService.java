@@ -54,8 +54,11 @@ public class VNPayService {
         var returnUrl = buildReturnUrl(txnRef);                 // 3. FE redirect by returnUrl
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-        var vnCalendar = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+        formatter.setTimeZone(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
+//        var vnCalendar = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+        Calendar vnCalendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
         var createdDate = formatter.format(vnCalendar.getTime());
+        System.out.println("VNPAY-time: " + createdDate);
         vnCalendar.add(Calendar.MINUTE, 15);
         var expiredDate = formatter.format(vnCalendar.getTime());    // 4. expiredDate for secure
 

@@ -1,5 +1,6 @@
 package vn.nmn.domusvocationis.domain.response.post;
 
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,6 +29,9 @@ public class ResSurveyStatsDTO {
         private QuestionTypeEnum type;
         private int totalAnswers;
         private List<ChartDataDTO> chartData;
+
+//        @Column(columnDefinition = "TEXT")
+//        private String answers;
 
         @Getter
         @Setter
